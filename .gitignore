@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+pihu_memory.json
+pihu_chat.json
+pihu_reminders.json
+.env
