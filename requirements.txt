@@ -2,3 +2,4 @@ Flask
 requests
 google-genai
 gunicorn
+psycopg[binary]
