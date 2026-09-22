@@ -1,11 +1,8 @@
-"""Cloud health endpoint for Pihu-BreakThough.
-
-This endpoint is intentionally small: it verifies that the Vercel Python
-runtime can import Pihu's core and, when configured, reach Neon PostgreSQL.
-"""
+"""Cloud health endpoint for Pihu-BreakThough."""
+import json
 import os
 
-from flask import jsonify
+from flask import Response
 
 from pihu_core.router import PihuRouter
 
@@ -25,8 +22,7 @@ def handler(request):
         except Exception as exc:
             db_error = str(exc)
 
-    router = PihuRouter()
-    return jsonify({
+    payload = {
         "ok": True,
         "app": "Pihu-BreakThough",
         "runtime": "vercel",
@@ -35,5 +31,6 @@ def handler(request):
             "reachable": db_ok,
             "error": db_error,
         },
-        "capabilities": router.capabilities(),
-    })
+        "capabilities": PihuRouter().capabilities(),
+    }
+    return Response(json.dumps(payload), status=200, mimetype="application/json")
