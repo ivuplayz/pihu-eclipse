@@ -1,19 +1,24 @@
 """Minimal Vercel chat endpoint for Pihu-BreakThough."""
-from flask import jsonify, request
+import json
+
+from flask import Response, request
 
 from pihu_core.router import PihuRouter
 
 router = PihuRouter()
 
+def _response(payload, status=200):
+    return Response(json.dumps(payload), status=status, mimetype="application/json")
+
 def handler(req):
     if req.method != "POST":
-        return jsonify({"ok": False, "error": "Use POST"}), 405
+        return _response({"ok": False, "error": "Use POST"}, 405)
 
-    body = req.get_json(silent=True) or {}
+    body = request.get_json(silent=True) or {}
     message = str(body.get("message", "")).strip()
 
     if not message:
-        return jsonify({"ok": False, "error": "message is required"}), 400
+        return _response({"ok": False, "error": "message is required"}, 400)
 
     result = router.chat([
         {
@@ -27,13 +32,13 @@ def handler(req):
     ])
 
     if not result.ok:
-        return jsonify({
+        return _response({
             "ok": False,
             "error": result.error,
             "provider": result.provider,
-        }), 503
+        }, 503)
 
-    return jsonify({
+    return _response({
         "ok": True,
         "answer": result.text,
         "provider": result.provider,
